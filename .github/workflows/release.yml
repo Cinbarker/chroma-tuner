@@ -211,14 +211,55 @@ jobs:
           path: |
             ${{ steps.cargo-dist.outputs.paths }}
             ${{ env.BUILD_MANIFEST_NAME }}
+
+  # Build macOS app bundle
+  build-macos-app:
+    needs:
+      - plan
+      - build-local-artifacts
+    if: ${{ needs.plan.outputs.publishing == 'true' }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+      
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      
+      - name: Install cargo-bundle
+        run: cargo install cargo-bundle
+      
+      - name: Build app bundle
+        run: |
+          cargo bundle --release
+          
+      - name: Create app bundle archive
+        run: |
+          cd target/release/bundle/osx/
+          tar -czf "../../../../Chroma-Tuner-macOS.tar.gz" "Chroma Tuner.app"
+          cd ../../../../
+          
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-app-bundle
+          path: Chroma-Tuner-macOS.tar.gz
+
   # Determines if we should publish/announce
   host:
     needs:
       - plan
       - build-local-artifacts
       - build-global-artifacts
+      - build-macos-app
     # Only run if we're "publishing", and only if local and global didn't fail (skipped is fine)
-    if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') }}
+    if: ${{ always() && needs.plan.outputs.publishing == 'true' && (needs.build-global-artifacts.result == 'skipped' || needs.build-global-artifacts.result == 'success') && (needs.build-local-artifacts.result == 'skipped' || needs.build-local-artifacts.result == 'success') && (needs.build-macos-app.result == 'skipped' || needs.build-macos-app.result == 'success') }}
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: "ubuntu-22.04"
@@ -262,6 +303,11 @@ jobs:
           pattern: artifacts-*
           path: artifacts
           merge-multiple: true
+      - name: "Download macOS App Bundle"
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-app-bundle
+          path: artifacts
       - name: Cleanup
         run: |
           # Remove the granular manifests

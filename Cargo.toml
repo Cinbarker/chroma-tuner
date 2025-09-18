@@ -1,0 +1,74 @@
+[package]
+name = "chroma-tuner"
+version = "0.1.0"
+edition = "2021"
+authors = ["Cinbarker"]
+description = "A lightweight, native instrument tuner with real-time pitch detection"
+license = "MIT"
+repository = "https://github.com/cinbarker/chroma-tuner"
+keywords = ["tuner", "music", "audio", "pitch-detection", "instrument"]
+categories = ["multimedia::audio"]
+readme = "README.md"
+
+[[bin]]
+name = "chroma-tuner"
+path = "src/main.rs"
+
+[dependencies]
+# GUI Framework
+egui = { version = "0.32", default-features = false }
+eframe = { version = "0.32", default-features = false, features = [
+    "default_fonts",
+    "glow",
+] }
+
+# Audio Processing
+cpal = "0.16"
+rustfft = "6.2"
+realfft = "3.3"
+
+# Image processing
+image = "0.25"
+
+
+# Utilities
+anyhow = "1.0"
+env_logger = "0.11"
+
+
+[profile.dev]
+opt-level = 1
+debug = 1
+incremental = true
+codegen-units = 256
+split-debuginfo = "unpacked"
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+[package.metadata.bundle]
+name = "Chroma Tuner"
+identifier = "com.cinbarker.chroma-tuner"
+icon = ["assets/icons/icon.icns"]
+version = "0.1.0"
+resources = []
+copyright = "Copyright (c) Cinbarker 2024. All rights reserved."
+category = "Utility"
+short_description = "A lightweight, native instrument tuner"
+long_description = "A lightweight, native instrument tuner with real-time pitch detection built in Rust."
+osx_minimum_system_version = "10.12"
+
+[package.metadata.bundle.osx]
+info_plist_additions = """
+<key>NSMicrophoneUsageDescription</key>
+<string>Chroma Tuner needs microphone access to detect instrument pitch for tuning.</string>
+"""
+

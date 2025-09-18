@@ -4,13 +4,13 @@ A lightweight, native instrument tuner with real-time pitch detection built in R
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg)]()
+[![Platform](https://img.shields.io/badge/platform-macOS-lightgrey.svg)]()
 
 ## Goals
 
 - Accurate real-time pitch detection
 - Minimal resource usage
-- Native performance on macOS and Linux
+- Native performance on macOS
 - Simple, focused interface
 
 ## Features
@@ -19,7 +19,7 @@ A lightweight, native instrument tuner with real-time pitch detection built in R
 - Visual tuning display with needle and cent deviation
 - Audio device selection
 - Stable readings with noise filtering
-- Cross-platform support (macOS, Linux)
+- Native macOS support with app bundle
 
 ## Usage
 
@@ -71,9 +71,9 @@ The app bundle will be created at `target/bundle/osx/Chroma Tuner.app` and can b
 
 ## Distribution
 
-This project uses `cargo-dist` for cross-platform binary distribution and `cargo-bundle` for macOS app bundles:
+This project uses `cargo-dist` for binary distribution and `cargo-bundle` for macOS app bundles:
 
-- **Binaries**: Available via GitHub releases for macOS (Intel/Apple Silicon) and Linux
+- **Binaries**: Available via GitHub releases for macOS (Intel/Apple Silicon)
 - **Homebrew**: `brew install cinbarker/tap/chroma-tuner` (coming soon)
 - **macOS App**: Download `.app` bundle from releases or build locally
 
@@ -88,16 +88,5 @@ This project uses `cargo-dist` for cross-platform binary distribution and `cargo
 ## Prerequisites
 
 ### macOS
-- Rust toolchain
+- Rust toolchain (1.70+)
 - Core Audio (included with system)
-
-### Linux
-- Rust toolchain
-- ALSA development libraries:
-  ```bash
-  # Ubuntu/Debian
-  sudo apt install libasound2-dev
-  
-  # Fedora/RHEL
-  sudo dnf install alsa-lib-devel
-  ```

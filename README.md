@@ -71,11 +71,10 @@ The app bundle will be created at `target/bundle/osx/Chroma Tuner.app` and can b
 
 ## Distribution
 
-This project uses `cargo-dist` for binary distribution and `cargo-bundle` for macOS app bundles:
+Download the latest macOS app bundle from GitHub releases:
 
-- **Binaries**: Available via GitHub releases for macOS (Intel/Apple Silicon)
-- **Homebrew**: `brew install cinbarker/tap/chroma-tuner` (coming soon)
-- **macOS App**: Download `.app` bundle from releases or build locally
+- **macOS App Bundle**: `Chroma-Tuner-vX.X.X-macOS.tar.gz` - Extract and drag to Applications
+- **Build locally**: Use `./scripts/bundle-mac.sh` or `cargo bundle --release`
 
 ## Technical Details
 

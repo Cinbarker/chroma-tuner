@@ -1,75 +1,71 @@
 #!/bin/bash
 set -e
 
-# Build macOS app bundle using cargo-bundle
+# Simple macOS app bundle creation script
+# Much lighter than cargo-bundle
 
-echo "Building macOS app bundle..."
+APP_NAME="Chroma Tuner"
+BUNDLE_ID="com.cinbarker.chroma-tuner"
+VERSION="0.1.1"
 
-# Check if we're in the right directory
-if [ ! -f "Cargo.toml" ]; then
-    echo "Error: Must be run from project root directory"
+echo "Creating macOS app bundle..."
+
+# Build the binary first
+cargo build --release
+
+# Create app bundle structure
+BUNDLE_DIR="target/release/$APP_NAME.app"
+rm -rf "$BUNDLE_DIR"
+mkdir -p "$BUNDLE_DIR/Contents/MacOS"
+mkdir -p "$BUNDLE_DIR/Contents/Resources"
+
+# Copy the binary
+cp "target/release/chroma-tuner" "$BUNDLE_DIR/Contents/MacOS/"
+
+# Copy the icon
+cp "assets/icons/icon.icns" "$BUNDLE_DIR/Contents/Resources/"
+
+# Create Info.plist
+cat > "$BUNDLE_DIR/Contents/Info.plist" << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleExecutable</key>
+    <string>chroma-tuner</string>
+    <key>CFBundleIdentifier</key>
+    <string>$BUNDLE_ID</string>
+    <key>CFBundleName</key>
+    <string>$APP_NAME</string>
+    <key>CFBundleDisplayName</key>
+    <string>$APP_NAME</string>
+    <key>CFBundleVersion</key>
+    <string>$VERSION</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$VERSION</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleIconFile</key>
+    <string>icon.icns</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.12</string>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Chroma Tuner needs microphone access to detect instrument pitch for tuning.</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+</dict>
+</plist>
+EOF
+
+echo "App bundle created at: $BUNDLE_DIR"
+echo "Size: $(du -sh "$BUNDLE_DIR" | cut -f1)"
+
+# Test that it works
+if [[ -f "$BUNDLE_DIR/Contents/MacOS/chroma-tuner" ]]; then
+    echo "✅ Bundle created successfully!"
+else
+    echo "❌ Bundle creation failed!"
     exit 1
 fi
-
-# Install cargo-bundle if not present
-if ! command -v cargo-bundle &> /dev/null; then
-    echo "Installing cargo-bundle..."
-    cargo install cargo-bundle
-fi
-
-# Clean previous builds
-echo "Cleaning previous builds..."
-rm -rf target/release/bundle/
-
-# Build the app bundle
-echo "Building app bundle..."
-cargo bundle --release
-
-# Check if bundle was created successfully
-BUNDLE_PATH="target/release/bundle/osx/Chroma Tuner.app"
-if [ ! -d "$BUNDLE_PATH" ]; then
-    echo "Error: Bundle creation failed"
-    exit 1
-fi
-
-echo "Bundle created at: $BUNDLE_PATH"
-
-# Add microphone permission to Info.plist
-echo "Adding microphone permission..."
-PLIST_PATH="$BUNDLE_PATH/Contents/Info.plist"
-if ! grep -q "NSMicrophoneUsageDescription" "$PLIST_PATH"; then
-    /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string 'Chroma Tuner needs microphone access to detect instrument pitch for tuning.'" "$PLIST_PATH" 2>/dev/null || true
-    echo "Microphone permission added"
-else
-    echo "Microphone permission already present"
-fi
-
-# Create DMG for distribution (requires create-dmg)
-if command -v create-dmg &> /dev/null; then
-    echo "Creating DMG installer..."
-    rm -f "Chroma Tuner.dmg"
-    create-dmg \
-        --volname "Chroma Tuner" \
-        --window-pos 200 120 \
-        --window-size 600 300 \
-        --icon-size 100 \
-        --icon "Chroma Tuner.app" 175 120 \
-        --hide-extension "Chroma Tuner.app" \
-        --app-drop-link 425 120 \
-        "Chroma Tuner.dmg" \
-        "$BUNDLE_PATH"
-    echo "DMG created: Chroma Tuner.dmg"
-else
-    echo "Install 'create-dmg' (brew install create-dmg) to generate DMG installer"
-fi
-
-# Bundle info
-echo ""
-echo "Bundle Information:"
-echo "  Path: $BUNDLE_PATH"
-echo "  Size: $(du -sh "$BUNDLE_PATH" | cut -f1)"
-echo "  Executable: $(file "$BUNDLE_PATH/Contents/MacOS/chroma-tuner" | cut -d: -f2-)"
-
-echo ""
-echo "macOS app bundle ready!"
-echo "Drag '$BUNDLE_PATH' to your Applications folder"

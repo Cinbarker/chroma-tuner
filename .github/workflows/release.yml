@@ -17,17 +17,14 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Install cargo-bundle
-        run: cargo install cargo-bundle
-
       - name: Build app bundle
-        run: cargo bundle --release
+        run: ./scripts/bundle-mac.sh
 
       - name: Create release archive
         run: |
-          cd target/release/bundle/osx/
-          tar -czf "../../../../Chroma-Tuner-${{ github.ref_name }}-macOS.tar.gz" "Chroma Tuner.app"
-          cd ../../../../
+          cd target/release/
+          tar -czf "../../Chroma-Tuner-${{ github.ref_name }}-macOS.tar.gz" "Chroma Tuner.app"
+          cd ../../
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

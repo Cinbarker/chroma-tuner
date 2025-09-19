@@ -1,6 +1,6 @@
 # Chroma Tuner
 
-A lightweight, native instrument tuner with real-time pitch detection built in Rust.
+A lightweight instrument tuner with real-time pitch detection built in Rust.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.70+-orange.svg)](https://www.rust-lang.org)
@@ -36,17 +36,11 @@ cargo run --release
 
 #### macOS App Bundle
 ```bash
-# Install cargo-bundle (one-time setup)
-cargo install cargo-bundle
-
-# Create .app bundle
-cargo bundle --release
-
-# Or use the bundling script (recommended)
+# Create .app bundle (lightweight, no dependencies)
 ./scripts/bundle-mac.sh
 ```
 
-The app bundle will be created at `target/bundle/osx/Chroma Tuner.app` and can be dragged to your Applications folder.
+The app bundle will be created at `target/release/Chroma Tuner.app` and can be dragged to your Applications folder.
 
 ### Tuning
 1. Run the application
@@ -74,7 +68,7 @@ The app bundle will be created at `target/bundle/osx/Chroma Tuner.app` and can b
 Download the latest macOS app bundle from GitHub releases:
 
 - **macOS App Bundle**: `Chroma-Tuner-vX.X.X-macOS.tar.gz` - Extract and drag to Applications
-- **Build locally**: Use `./scripts/bundle-mac.sh` or `cargo bundle --release`
+- **Build locally**: Use `./scripts/bundle-mac.sh`
 
 ## Technical Details
 
